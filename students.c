@@ -3,12 +3,13 @@
  * the assignment.  Make sure to add your name and @oregonstate.edu email
  * address below:
  *
- * Name:
- * Email:
+ * Name:Li Hung Chen
+ * Email:chenlih@oregonstate.edu
  */
 
 #include <stdio.h>
-
+#include <stdlib.h>
+#include <string.h>
 #include "students.h"
 #include "dynarray.h"
 
@@ -27,8 +28,19 @@
  *   Should return a newly-allocated student structure whose fields are
  *   initialized with the values provided.
  */
-struct student* create_student(char* name, int id, float gpa) {
-  return NULL;
+struct student* create_student(char* name, int id, float gpa) {		
+	struct student* cs=malloc(sizeof(struct student));	//create pointer cs and alloc memory
+	int n=strlen(name);					//define name's length to n
+	char* cs_name=malloc(n*sizeof(char));			//cs_name's memory is as same as name's
+	strncpy(cs_name,name,n);				//copy name's value to cs_name
+
+								
+	cs->name=cs_name;					//pointer cs point to name and has value cs_name
+	cs->id=id;						//pointer cs point to id and has value id		
+	cs->gpa=gpa;						//pointer cs point to gpa and has value gpa
+	
+
+  return cs;							//return pointer cs
 }
 
 
@@ -43,6 +55,9 @@ struct student* create_student(char* name, int id, float gpa) {
  *     as well as memory allocated for the struct itself.
  */
 void free_student(struct student* student) {
+								
+free(student->name);						//free the memory which point to the name
+free(student);							//free the memory which point to student
 
 }
 
@@ -78,7 +93,18 @@ void free_student(struct student* student) {
  */
 struct dynarray* create_student_array(int num_students, char** names, int* ids,
     float* gpas) {
-  return NULL;
+
+	struct dynarray* csa=dynarray_create();			 //create dynarray by using function from dynarray.c
+	
+
+	for(int i=0; i<num_students;i++){			 //use loop to put data one by one
+	 struct student* stc=create_student(names[i],ids[i],gpas[i]); //create students
+
+	 dynarray_insert(csa,i,stc);			//using function from dynarray.c to insert stc into array csa
+
+	}
+
+  return csa;
 }
 
 
@@ -97,6 +123,14 @@ struct dynarray* create_student_array(int num_students, char** names, int* ids,
  *     is to be freed
  */
 void free_student_array(struct dynarray* students) {
+int n=dynarray_size(students);
+struct student* st;
+
+    for(int i=0;i<n;i++){
+      st=dynarray_get(students,i);
+      free_student(st);
+    }
+  dynarray_free(students);  
 
 }
 
@@ -110,6 +144,13 @@ void free_student_array(struct dynarray* students) {
  *   students - the dynamic array of students to be printed
  */
 void print_students(struct dynarray* students) {
+int n=dynarray_size(students);					//find the array size
+int i;
+struct student* stu;
+  for(i=0;i<n;i++){						//use loop to prinf student
+     stu=dynarray_get(students,i);
+     printf("%s  %d  %f \n",stu->name,stu->id,stu->gpa);
+  }
 
 }
 
@@ -132,7 +173,22 @@ void print_students(struct dynarray* students) {
  *   the array.
  */
 struct student* find_max_gpa(struct dynarray* students) {
-  return NULL;
+int n=dynarray_size(students);				//get the size of array student
+float maxgpa=0;						//define max gpa =0
+
+struct student* stud;
+int maxgpa_index=-1;
+
+
+   for(int i;i<n;i++){					//use loop to compare each gpa with maxgpa
+   stud=dynarray_get(students,i);			//if greater than maxgpa,then replace to maxgpa
+      if(stud->gpa >maxgpa){
+	maxgpa=stud->gpa;
+	maxgpa_index=i;
+	}
+   }
+
+  return dynarray_get(students,maxgpa_index);	
 }
 
 
@@ -154,7 +210,20 @@ struct student* find_max_gpa(struct dynarray* students) {
  *   the array.
  */
 struct student* find_min_gpa(struct dynarray* students) {
-  return NULL;
+int n=dynarray_size(students);
+float mingpa=100;							//define mingpa=4
+
+struct student* stud;
+int mingpa_index=-1;
+
+  for(int j=0;j<n;j++){						//use loop to compare with mingpa
+     stud=dynarray_get(students,j);
+	 if(stud->gpa <mingpa){					//if smaller than mingpa,then replace to mingpa
+           mingpa=stud->gpa;
+	   mingpa_index=j;
+      }
+  }
+  return dynarray_get(students,mingpa_index);
 }
 
 
@@ -176,5 +245,19 @@ struct student* find_min_gpa(struct dynarray* students) {
  *     returns, this array should be sorted by descending GPA.
  */
 void sort_by_gpa(struct dynarray* students) {
+int n=dynarray_size(students);						//define n as the size of students
 
+  for(int i=0;i<n-1;i++){						
+	for(int j=0;j<n-i-1;j++){					
+	struct student* st1=dynarray_get(students,j);
+	struct student* st2=dynarray_get(students,j+1);
+
+	  if(st1->gpa <st2->gpa){					//if former one smaller than later one
+	  struct student* tmp=dynarray_get(students,j);			//switch these two value
+	  dynarray_set(students,j,dynarray_get(students,j+1));	
+	  dynarray_set(students,j+1,tmp);
+	  }
+	}
+
+  }
 }
