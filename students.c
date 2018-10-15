@@ -126,11 +126,11 @@ void free_student_array(struct dynarray* students) {
 int n=dynarray_size(students);
 struct student* st;
 
-    for(int i=0;i<n;i++){
+    for(int i=0;i<n;i++){				//use loop to free each data in the array students
       st=dynarray_get(students,i);
       free_student(st);
     }
-  dynarray_free(students);  
+  dynarray_free(students);  				//free students
 
 }
 
